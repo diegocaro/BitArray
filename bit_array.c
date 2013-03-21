@@ -1,4 +1,11 @@
 /*
+ * commit 640451233b7958e5ae85572ea570a86a15934915
+ * Author: Diego Caro <diegocaro@gmail.com>
+ * Date:   Mon May 21 20:28:13 2012 -0400
+ * https://github.com/diegocaro/BitArray/
+ */
+
+/*
  bit_array.c
  project: bit array C library
  url: https://github.com/noporpoise/BitArray/
@@ -684,3 +691,63 @@ BIT_ARRAY* bit_array_load(FILE* f) {
   return bitarr;
 }
 
+void bit_array_concat(BIT_ARRAY *dest, BIT_ARRAY *from) {
+	unsigned int count, corr, desp;
+	unsigned int nwords_old, nwords_new;
+	unsigned int newsize;
+	
+	word_t *d;
+	word_t *f;
+	
+	desp = dest->num_of_bits % WORD_SIZE;
+	corr = WORD_SIZE - desp;
+
+	newsize = dest->num_of_bits + from->num_of_bits;
+	nwords_old = nwords(dest->num_of_bits);
+	nwords_new = nwords(newsize);
+
+	bit_array_resize(dest, newsize);
+
+	d = &dest->words[nwords_old - 1];
+	f = from->words;	
+
+	count = nwords_new - nwords_old;
+	while (count--) {
+		*d++ |= (*f << desp);
+		*d = *f++ >> corr;
+	}
+	
+	*d++ |= (*f << desp);
+}
+
+void bit_array_concat_slow(BIT_ARRAY *dest, BIT_ARRAY *from) {
+	size_t newsize;
+	size_t desp;
+	size_t i;
+	size_t oldsize;
+	size_t j;
+	
+	desp = dest->num_of_bits % WORD_SIZE;
+//	printf("desp: %u\n", desp);
+//	printf("words(a): %u\n", nwords(dest->num_of_bits));
+//	printf("words(b): %u\n", nwords(from->num_of_bits));
+	oldsize = dest->num_of_bits;
+		
+	newsize = dest->num_of_bits + from->num_of_bits;
+//	printf("words(concat): %u\n", nwords(newsize));
+	bit_array_resize(dest, newsize);
+	
+//	dest->words[0] = dest->words[0] | (from->words[0] << desp);
+	
+	for ( j=0, i = nwords(oldsize); i < nwords(newsize); i++ , j++) {
+//		printf("i: %u ~ %u: j\n", i, j);
+		dest->words[i-1] = dest->words[i-1] | (from->words[j] << (desp));
+		dest->words[i] = from->words[j] >> (WORD_SIZE - desp);
+	}
+	
+	i = nwords(newsize);
+	j = nwords(from->num_of_bits) -1 ;
+	dest->words[i-1] = dest->words[i-1] | (from->words[j] << (desp));
+	
+	
+}

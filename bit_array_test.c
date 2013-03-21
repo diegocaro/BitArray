@@ -1,4 +1,11 @@
 /*
+ * commit 640451233b7958e5ae85572ea570a86a15934915
+ * Author: Diego Caro <diegocaro@gmail.com>
+ * Date:   Mon May 21 20:28:13 2012 -0400
+ * https://github.com/diegocaro/BitArray/
+ */
+
+/*
  bit_array_test.c
  project: bit array C library
  url: https://github.com/noporpoise/BitArray/
@@ -28,6 +35,30 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "bit_array.h"
+
+void test_resize(char *a, char *b, char *c) {
+	int sa,sb,sc;
+	char *d;
+	
+	sa = strlen(a);
+	sb = strlen(b);
+	sc = strlen(c);
+	
+	
+	if (sc != (sa + sb)) {
+		printf("Error, size doesnt match!!!\n");
+		return;
+	}
+	
+	d = malloc(sc+1);
+	memcpy(d, a, sa);
+	memcpy(&d[sa], b, sb);
+	
+	if (strcmp(c,d) != 0) {
+		printf("Error, there are bad bits!!!\n");
+	}
+	free(d);
+}
 
 int main(int argc, char* argv[])
 {
@@ -175,6 +206,40 @@ int main(int argc, char* argv[])
   str = bit_array_to_string(bitarr);
   printf("'%s'\n", str);
   free(str);
+
+
+  // concat two bit arrays
+  //////////////////////////
+  a = bit_array_create(33);
+  b = bit_array_create(66);
+	
+  bit_array_set_bit(a, 0);
+  //	bit_array_set_bit(a, 3);
+  //	bit_array_set_bit(a, 4);
+  bit_array_set_bit(a, 32);
+
+  bit_array_set_bit(b, 0);
+  bit_array_set_bit(b, 1);
+  bit_array_set_bit(b, 2);
+  bit_array_set_bit(b, 3);
+  bit_array_set_bit(b, 4);
+  bit_array_set_bit(b, 65);
+
+  sa = bit_array_to_string(a);
+  sb = bit_array_to_string(b);
+
+  bit_array_concat(a, b);
+
+  sc = bit_array_to_string(a);
+
+	printf("should be: '%s%s'\n", sa, sb);	
+	printf("concat   : '%s'\n", sc);
+
+  test_resize(sa, sb, sc);
+
+  free(sa);
+  free(sb);
+  free(sc);
 
   printf(" THE END.\n");
   

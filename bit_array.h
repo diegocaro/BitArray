@@ -1,4 +1,11 @@
 /*
+ * commit 640451233b7958e5ae85572ea570a86a15934915
+ * Author: Diego Caro <diegocaro@gmail.com>
+ * Date:   Mon May 21 20:28:13 2012 -0400
+ * https://github.com/diegocaro/BitArray/
+ */
+
+/*
  bit_array.h
  project: bit array C library
  url: https://github.com/noporpoise/BitArray/
@@ -118,5 +125,10 @@ char bit_array_get_char(BIT_ARRAY* bitarr, bit_index_t start);
 // store and load bit array from a file
 BIT_ARRAY* bit_array_load(FILE* f);
 void bit_array_save(BIT_ARRAY* bitarr, FILE* f);
+
+// add bits from orig to dest, also replace dest with the new version
+// this is like a += x (you lost the old value in a)
+void bit_array_concat(BIT_ARRAY *dest, BIT_ARRAY *orig); //fast version
+void bit_array_concat_slow(BIT_ARRAY *dest, BIT_ARRAY *orig);
 
 #endif
